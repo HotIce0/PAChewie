@@ -1,7 +1,7 @@
 """动力模块
-ESC (Electronic Speed Control) Module
+ESC (Electronic Speed Control)
 
-The ESC Driver must implement below fun
+The ESC Driver must implement below function
 
 trc()
 esc_programing()
@@ -12,9 +12,9 @@ get_pwms()
 """
 
 
-class PA_Module_ESC:
+class PA_DriverInterface_ESC:
     """
-    ESC (Electronic Speed Control) Module is used to init, config, control (speed) the motor.
+    ESC (Electronic Speed Control) is used to init, config, control (speed) the motor.
     (电调模块被用于初始化，配置，控制(转速) 电机)
     """
     def __init__(self, driver):

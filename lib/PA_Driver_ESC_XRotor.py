@@ -2,13 +2,18 @@
 ESC (Electronic Speed Control) Driver For XRotor (40A test OK)
 """
 from machine import PWM
+from machine import Pin
 import time
+from config import config
 
 
 class PA_Driver_ESC_XRotor:
-    def __init__(self, pins, freq=500, duty_max=1023, duty_min=400):
-        self.pins = pins
-        self.number_of_axles = len(pins)
+    def __init__(self, freq=500, duty_max=1023, duty_min=400):
+        pins_num = config['ESC_CONFIG']['PINS']
+        self.pins = []
+        for i in pins_num:
+            self.pins.append(Pin(i))
+        self.number_of_axles = config['NUM_OF_CHANNEL']
         self.freq = freq
         self.duty_max = duty_max
         self.duty_min = duty_min

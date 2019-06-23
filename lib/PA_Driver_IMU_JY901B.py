@@ -1,7 +1,9 @@
-# import ustruct
-import struct
+import ustruct
+from machine import UART
+from config import config
 
-class PA_Driver_JY901B:
+
+class PA_Driver_IMU_JY901B:
     """
 
     printf("Time:20%d-%d-%d %d:%d:%.3f\r\n",(short)JY901.stcTime.ucYear,(short)JY901.stcTime.ucMonth,(short)JY901.stcTime.ucDay,(short)JY901.stcTime.ucHour,(short)JY901.stcTime.ucMinute,(float)JY901.stcTime.ucSecond+(float)JY901.stcTime.usMiliSecond/1000);
@@ -16,6 +18,9 @@ class PA_Driver_JY901B:
     """
 
     def __init__(self):
+        imu_config = config['IMU_CONFIG']
+        self.uart = UART(1, imu_config['BAUDRATE'], tx=imu_config['TX'], rx=imu_config['RX'])
+
         self.time_year = None
         self.time_month = None
         self.time_day = None
@@ -58,55 +63,52 @@ class PA_Driver_JY901B:
         self.gps_yaw = None
         self.gps_velocity = None
 
+    def update(self):
+        """
+        Read from IMU and Parse data
+        :return:
+        """
+        data = self.uart.read()
+        if data:
+            self.parse(data)
+            print(self.get_angles())
+
     def parse(self, data):
         """
-        parse the IMU data from buffer
+        Parse the IMU data from buffer
         :param data:
         :return:
         """
         length = len(data)
         index = 0
+        data = bytes(data)
         while True:
-            pos = data.find(0x55, index)
+            pos = data.find(b'\x55', index)
             if pos == -1 or length - index < 11:
                 break
             sig = data[pos + 1]
             if sig == 0x50:  # stcTime
                 self.time_year, self.time_month, self.time_day, \
                 self.time_minute, self.time_second, self.time_milisecond \
-                    = struct.unpack_from("BBBBBBH", data, pos + 2)
+                    = ustruct.unpack_from("BBBBBBH", data, pos + 2)
             elif sig == 0x51:  # stcAcc
-                self.acc_a0, self.acc_a1, self.acc_a2, self.acc_T = struct.unpack_from("hhhh", data, pos + 2)
+                self.acc_a0, self.acc_a1, self.acc_a2, self.acc_T = ustruct.unpack_from("hhhh", data, pos + 2)
             elif sig == 0x52:  # stcGyro
-                self.gyro_w0, self.gyro_w1, self.gyro_w2, self.gyro_T = struct.unpack_from("hhhh", data, pos + 2)
+                self.gyro_w0, self.gyro_w1, self.gyro_w2, self.gyro_T = ustruct.unpack_from("hhhh", data, pos + 2)
             elif sig == 0x53:  # stcAngle
-                self.angle_0, self.angle_1, self.angle_2, self.angle_T = struct.unpack_from("hhhh", data, pos + 2)
+                self.angle_0, self.angle_1, self.angle_2, self.angle_T = ustruct.unpack_from("hhhh", data, pos + 2)
             elif sig == 0x54:  # stcMag
-                self.mag_h0, self.mag_h1, self.mag_h2, self.mag_T = struct.unpack_from("hhhh", data, pos + 2)
+                self.mag_h0, self.mag_h1, self.mag_h2, self.mag_T = ustruct.unpack_from("hhhh", data, pos + 2)
             elif sig == 0x55:  # stcDStatus
-                self.status0, self.status1, self.status2, self.status3 = struct.unpack_from("hhhh", data, pos + 2)
+                self.status0, self.status1, self.status2, self.status3 = ustruct.unpack_from("hhhh", data, pos + 2)
             elif sig == 0x56:  # stcPress
-                self.press_pressure, self.press_altitude = struct.unpack_from("ll", data, pos + 2)
+                self.press_pressure, self.press_altitude = ustruct.unpack_from("ll", data, pos + 2)
             elif sig == 0x57:  # stcLonLat
-                self.pos_lon, self.pos_lat = struct.unpack_from("LL", data, pos + 2)
+                self.pos_lon, self.pos_lat = ustruct.unpack_from("LL", data, pos + 2)
             elif sig == 0x58:  # stcGPSV
-                self.gps_height, self.gps_yaw, self.gps_velocity = struct.unpack_from("ssl", data, pos + 2)
+                self.gps_height, self.gps_yaw, self.gps_velocity = ustruct.unpack_from("ssl", data, pos + 2)
             index = pos + 11
 
-# Test Code
-# str_temp = ""
-# buf = b'UQ\xdf\x00S\x00\x0f\x08\x1f\x0f\x1dUR\x00\x00\x00\x00\x00\x00\x1f\x0f\xd5US\xa0\x01\xa0\xfb\xf0\x00\r)\nUT\xe7\xffy\x00\xfb\xfe\x1f\x0f/UQ\xde\x00T\x00\x10\x08\x1f\x0f\x1eUR\x00\x00\x00\x00\x00\x00\x1f\x0f\xd5US\xa0\x01\xa0\xfb\xf5\x00\r)\x0fUT\xe8\xff}\x00\xfc\xfe\x1f\x0f5UQ\xe0\x00S\x00\x11\x08%\x0f&UR\x00\x00\x00\x00\x00\x00%\x0f\xdbUS\xa0\x01\xa0\xfb\xee\x00\r)\x08UT\xe7\xffy\x00\xfd\xfe%\x0f7UQ\xe0\x00R\x00\x11\x08&\x0f&UR\x00\x00\x00\x00\x00\x00&\x0f\xdcUS\xa0\x01\xa0\xfb\xe4\x00\r)\xfeUT\xe7\xffy\x00\xfd\xfe&\x0f8UQ\xe0\x00R\x00\x11\x08&\x0f&UR\x00\x00\x00\x00\x00\x00&\x0f\xdcUS\xa0\x01\xa0\xfb\xde\x00\r)\xf8UT\xea\xffz\x00\x00\xff&\x0f@UQ\xe1\x00R\x00\x11\x08&\x0f\'UR\x00\x00\x00\x00\x00\x00&\x0f\xdcUS\xa0\x01\x9f\xfb\xe0\x00\r)\xf9UT\xe6\xff|\x00\xfd\xfe&\x0f:'
-# for c in buf:
-#     str_temp += (str(hex(c)) + " ")
-# print(str_temp)
-#
-# jy901b = PA_Driver_JY901B()
-# jy901b.parse(buf)
-# print(jy901b.__dict__)
-#
-# # 0xa5 0xf9 0x7c 0xfc 0x63 0x1 0x8f 0xf
-#
-# sao = bytes([0xa4, 0xf9])
-# print(sao)
-# print(struct.unpack_from("h", sao))
-# print(-1628 / 32768 * 16)
+    def get_angles(self):
+        return self.angle_0 / 32768 * 180, self.angle_1 / 32768 * 180, self.angle_2 / 32768 * 180
+

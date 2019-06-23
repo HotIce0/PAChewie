@@ -11,7 +11,10 @@ class PA_Module_Safe:
         #
         pass
 
-    def pre_check(self, sensor):
+    def __call__(self, *args, **kwargs):
+        pass
+
+    def pre_check(self):
         """
         Do complete check before takeoff
         :param sensor:
@@ -19,7 +22,7 @@ class PA_Module_Safe:
         """
         print("do pre check...")
         # 传感器检查
-        sensor.pre_check()
+        # sensor.pre_check()
         # 电压检查
 
         # 参数检查
