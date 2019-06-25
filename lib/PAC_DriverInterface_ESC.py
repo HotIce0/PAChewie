@@ -40,3 +40,21 @@ class PAC_DriverInterface_ESC:
         """ Get the list of PWM objects : machine.PWM (获取PWM对象列表) """
         return self.driver.get_pwms()
 
+    def get_current_pwm_values(self):
+        """
+        Get current PWM values
+
+        return value like (400, 400, 400, 400)
+        :return:
+        """
+        return self.driver.get_current_pwm_values()
+
+    def update_current_pwm_values(self, pwms_val):
+        """
+        Update current PWM values
+
+        1. save pwms_val (and limit with max_output_value, min_output_value)
+        2. write pwms_val to output
+        :return:
+        """
+        return self.driver.update_current_pwm_values(pwms_val)

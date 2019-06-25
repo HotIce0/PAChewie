@@ -111,7 +111,7 @@ class PAC_Driver_IMU_JY901B:
         data = self.uart.read()
         if data:
             self.parse(data)
-            print(self.get_angles())
+            # print(self.get_angles())
 
     def parse(self, data):
         """

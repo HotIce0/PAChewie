@@ -11,29 +11,36 @@ class PAC_Driver_ESC_XRotor:
     def __init__(self, freq=500, duty_max=1023, duty_min=400):
         pins_num = config['ESC_CONFIG']['PINS']
         self.pins = []
-        for i in pins_num:
-            self.pins.append(Pin(i))
         self.number_of_axles = config['NUM_OF_CHANNEL']
         self.freq = freq
         self.duty_max = duty_max
         self.duty_min = duty_min
         self.pwms = []
+        self.pwms_val = []
+        # create Pin objects
+        for i in pins_num:
+            self.pins.append(Pin(i))
+        # init PWM with Pin objects
+        for i in range(0, self.number_of_axles):
+            self.pwms.append(PWM(self.pins[i], freq=freq, duty=0))
+            self.pwms_val.append(0)
 
     def trc(self):
         """ Throttle Range Calibration """
-        pins = self.pins
         number_of_axles = self.number_of_axles
         freq = self.freq
         duty_max = self.duty_max
         duty_min = self.duty_min
-        pwms = self.pwms
 
         print("calibrating throttle range <param: freq=%d, duty_max=%d, duty_min=%d>" % (freq, duty_max, duty_min))
+        pwms_val_temp = []
         for i in range(0, number_of_axles):
-            pwms.append(PWM(pins[i], freq=freq, duty=duty_max))
+            pwms_val_temp.append(duty_max)
+        self.update_current_pwm_values(pwms_val_temp)
         time.sleep(3)
         for i in range(0, number_of_axles):
-            pwms[i].duty(duty_min)
+            pwms_val_temp[i] = duty_min
+        self.update_current_pwm_values(pwms_val_temp)
         time.sleep(3)
         print("throttle range calibration done")
 
@@ -52,3 +59,28 @@ class PAC_Driver_ESC_XRotor:
     def get_pwms(self):
         """ Get the PWM objects : machine.PWM """
         return self.pwms
+
+    def get_current_pwm_values(self):
+        return self.pwms_val
+
+    def update_current_pwm_values(self, pwms_val):
+        """
+
+        :param pwms_val:
+        :return:
+        """
+        number_of_axles = self.number_of_axles
+        duty_max = self.duty_max
+        duty_min = self.duty_min
+        pwms = self.pwms
+        # update self pwms_val and limit with duty_max, duty_min
+        for i in range(0, number_of_axles):
+            if pwms_val[i] > duty_max:
+                pwms_val[i] = duty_max
+            elif pwms_val[i] < duty_min:
+                pwms_val[i] = duty_min
+            self.pwms_val[i] = pwms_val[i]
+
+        # write pwms_val to output
+        for i in range(0, number_of_axles):
+            pwms[i].duty(pwms_val[i])
