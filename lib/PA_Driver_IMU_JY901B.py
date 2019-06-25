@@ -1,6 +1,8 @@
 import ustruct
 from machine import UART
 from config import config
+import time
+from lib.PA_LIB_Retry import retry
 
 
 class PA_Driver_IMU_JY901B:
@@ -20,6 +22,10 @@ class PA_Driver_IMU_JY901B:
     def __init__(self):
         imu_config = config['IMU_CONFIG']
         self.uart = UART(1, imu_config['BAUDRATE'], tx=imu_config['TX'], rx=imu_config['RX'])
+        # do pre imu data receive check
+        print("do imu pre check")
+        self.imu_recv_check(pre=True)
+        print("imu pre check done")
 
         self.time_year = None
         self.time_month = None
@@ -63,6 +69,33 @@ class PA_Driver_IMU_JY901B:
         self.gps_yaw = None
         self.gps_velocity = None
 
+    def set_angle_zero_bias(self):
+        """
+        set the current ange to 0 degree as a reference
+        0xff 0xaa 0x01 0x08 0x00
+        :return:
+        """
+        self.uart.write(b'\xff\xaa\x01\x08\x00')
+
+    def imu_recv_check(self, pre=False):
+        """
+        imu data recv check
+        :param pre: is pre check
+        :return:
+        """
+        i = 0
+        while True:
+            if self.uart.any() < 1:
+                if pre:
+                    i += 1
+                    print("imu pre check retrying.%d" % i)
+                    time.sleep(1)
+                    continue
+                else:
+                    pass
+            else:
+                break
+
     def update(self):
         """
         Read from IMU and Parse data
@@ -71,7 +104,7 @@ class PA_Driver_IMU_JY901B:
         data = self.uart.read()
         if data:
             self.parse(data)
-            print(self.get_angles())
+            # print(self.get_angles())
 
     def parse(self, data):
         """
@@ -111,4 +144,3 @@ class PA_Driver_IMU_JY901B:
 
     def get_angles(self):
         return self.angle_0 / 32768 * 180, self.angle_1 / 32768 * 180, self.angle_2 / 32768 * 180
-

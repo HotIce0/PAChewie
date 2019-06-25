@@ -10,6 +10,13 @@ class PA_DriverInterface_IMU:
     def __init__(self, driver):
         self.driver = driver
 
+    def set_angle_zero_bias(self):
+        """
+        set the current ange to 0 degree as a reference
+        :return:
+        """
+        self.driver.set_angle_zero_bias()
+
     def update(self):
         """
         Update sensor data

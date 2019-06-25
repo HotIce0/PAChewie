@@ -44,4 +44,4 @@ class PAChewie:
             self.module_safe()
             self.module_cmd()
             self.module_sensor()
-            self.module_control()
+            self.module_control(module_sensor=self.module_sensor)

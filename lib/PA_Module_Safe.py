@@ -5,10 +5,12 @@
 
 class PA_Module_Safe:
     def __init__(self):
+        print("Safe Module initializing")
         # 未处于飞行状态才可以上锁, 默认启动时处于上锁状态
         self.lock = True
         self.pre_check_finish = False
         #
+        print("Safe Module initialization done.")
         pass
 
     def __call__(self, *args, **kwargs):

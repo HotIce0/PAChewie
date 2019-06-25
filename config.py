@@ -9,7 +9,7 @@ config = {
     },
     # IMU config
     "IMU_CONFIG": {
-        "BAUDRATE": 9600,
+        "BAUDRATE": 57600,
         "TX": 12,
         "RX": 13,
     },
