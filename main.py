@@ -1,8 +1,8 @@
-from PyAutopilot import PyAutopilot
+from PAChewie import PAChewie
 
 
 def main():
-    py_autopilot = PyAutopilot()
+    py_autopilot = PAChewie()
     py_autopilot.run()
 
 

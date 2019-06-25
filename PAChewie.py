@@ -5,7 +5,7 @@ from lib.PA_Module_Sensor import PA_Module_Sensor
 from lib.PA_Module_Control import PA_Module_Control
 
 
-class PyAutopilot:
+class PAChewie:
     def __init__(self):
         # get config
         num_of_channel = config['NUM_OF_CHANNEL']
