@@ -1,12 +1,12 @@
-from lib.PAC_DriverInterface_IMU import PAC_DriverInterface_IMU
+from lib.driver_interface_imu import PACDriverInterfaceIMU
 from driver_config import driver_config
 
 
-class PAC_Module_Sensor:
+class PACModuleSensor:
     def __init__(self):
         print("Sensor Module initializing")
         imu_driver = driver_config['IMU']()
-        self.imu = PAC_DriverInterface_IMU(imu_driver)
+        self.imu = PACDriverInterfaceIMU(imu_driver)
         self.imu.set_angle_zero_bias()
         print("Sensor Module initialization done.")
 

@@ -1,4 +1,4 @@
-class PAC_DriverInterface_IMU:
+class PACDriverInterfaceIMU:
     """
     acc: 加速度
     gyro: 陀螺仪

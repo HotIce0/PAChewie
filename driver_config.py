@@ -1,8 +1,8 @@
-from lib.PAC_Driver_ESC_XRotor import PAC_Driver_ESC_XRotor
-from lib.PAC_Driver_IMU_JY901B import PAC_Driver_IMU_JY901B
+from lib.driver_esc_xrotor import PACDriverESCXRotor
+from lib.driver_imu_jy901b import PACDriverIMUJY901B
 
 
 driver_config = {
-    "ESC": PAC_Driver_ESC_XRotor,
-    "IMU": PAC_Driver_IMU_JY901B,
+    "ESC": PACDriverESCXRotor,
+    "IMU": PACDriverIMUJY901B,
 }

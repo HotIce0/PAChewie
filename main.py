@@ -1,4 +1,4 @@
-from PAChewie import PAChewie
+from pachewie import PAChewie
 
 
 def main():

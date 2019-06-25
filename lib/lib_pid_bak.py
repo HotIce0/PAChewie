@@ -2,7 +2,7 @@ from micropython import const
 import math
 
 
-class PAC_LIB_PID:
+class PACLibPID:
     """
     Implementation of generic PID controller.
     """
@@ -57,13 +57,13 @@ class PAC_LIB_PID:
         error = sp - val
 
         # current error derivative
-        if pid_mod == PAC_LIB_PID.PID_MODE_DERIVATIV_CALC:
+        if pid_mod == PACLibPID.PID_MODE_DERIVATIV_CALC:
             d = (error - self.error_previous) / max(dt, self.dt_min)
             self.error_previous = error
-        elif pid_mod == PAC_LIB_PID.PID_MODE_DERIVATIV_CALC_NO_SP:
+        elif pid_mod == PACLibPID.PID_MODE_DERIVATIV_CALC_NO_SP:
             d = (-val - self.error_previous) / max(dt, self.dt_min)
             self.error_previous = -val
-        elif pid_mod == PAC_LIB_PID.PID_MODE_DERIVATIV_SET:
+        elif pid_mod == PACLibPID.PID_MODE_DERIVATIV_SET:
             d = -val_dot
         else:
             d = 0.0
@@ -74,13 +74,13 @@ class PAC_LIB_PID:
         # calculate PD output
         output = (error * kp) + (d * kd)
 
-        if ki > PAC_LIB_PID.SIGMA:
+        if ki > PACLibPID.SIGMA:
             # Calculate the error integral and check for saturation
             i = self.integral + (error * dt)
 
             # check for saturation
             if math.isfinite(i):
-                if (output_limit < PAC_LIB_PID.SIGMA or (math.fabs(output + (i * ki)) <= output_limit)) \
+                if (output_limit < PACLibPID.SIGMA or (math.fabs(output + (i * ki)) <= output_limit)) \
                         and (math.fabs(i) <= self.integral_limit):
                     # not saturated, use new integral value
                     self.integral = i
@@ -90,7 +90,7 @@ class PAC_LIB_PID:
 
         # limit output
         if math.isfinite(output):
-            if output_limit > PAC_LIB_PID.SIGMA:
+            if output_limit > PACLibPID.SIGMA:
                 if output > output_limit:
                     output = output_limit
                 elif output < -output_limit:

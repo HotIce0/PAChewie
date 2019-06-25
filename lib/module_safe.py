@@ -3,7 +3,7 @@
 """
 
 
-class PAC_Module_Safe:
+class PACModuleSafe:
     def __init__(self):
         print("Safe Module initializing")
         # 未处于飞行状态才可以上锁, 默认启动时处于上锁状态
