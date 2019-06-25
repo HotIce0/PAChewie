@@ -5,7 +5,7 @@ This project was inspired by a scene from a Hollywood movie I have seen, but unf
 
 
 ### Project structure:
-- /mian.py: Entry point (init PyAchewie class)
+- /mian.py: Entry point (init PAChewie class)
 - /config.py: Configuration of Modules and Drivers (like. PIN, BAUDRATE of UART...)
 - /driver_config.py: Configuration of that which drivers will be imported and used.
 - /pachewie.py: Main class, load modules and callback loop.
