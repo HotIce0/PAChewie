@@ -75,7 +75,14 @@ class PAC_Driver_IMU_JY901B:
         0xff 0xaa 0x01 0x08 0x00
         :return:
         """
+        # unlock register
+        self.uart.write(b'\xff\xaa\x69\x88\xb5')
+        time.sleep(1)
+        # do
         self.uart.write(b'\xff\xaa\x01\x08\x00')
+        time.sleep(1)
+        # lock register
+        self.uart.write(b'\xff\xaa\x69\x77\xA5')
 
     def imu_recv_check(self, pre=False):
         """
@@ -104,7 +111,7 @@ class PAC_Driver_IMU_JY901B:
         data = self.uart.read()
         if data:
             self.parse(data)
-            # print(self.get_angles())
+            print(self.get_angles())
 
     def parse(self, data):
         """

@@ -13,10 +13,6 @@ class PAChewie:
         esc_pin_num_arr = esc_config['PINS']
 
         self.num_of_channel = num_of_channel
-        # ESC PWM Pin
-        self.esc_pin_num_arr = esc_pin_num_arr
-        # ESC PWM Duty
-        self.effective_pwms = [0, 0, 0, 0]
 
         if len(esc_pin_num_arr) != num_of_channel:
             raise Exception("please check the config.py -> PIN_CONFIGS -> ESC_PINS: %s is right" % str(esc_pin_num_arr))
