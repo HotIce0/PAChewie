@@ -2,7 +2,7 @@ from micropython import const
 import math
 
 
-class PA_LIB_PID:
+class PAC_LIB_PID:
     PID_MODE_PID = const(0)
 
     def __init__(self, pid_mode):
@@ -52,7 +52,7 @@ class PA_LIB_PID:
         error = sp - val
 
         # D current error derivative
-        if pid_mod == PA_LIB_PID.PID_MODE_PID:
+        if pid_mod == PAC_LIB_PID.PID_MODE_PID:
             d = error - self.error_previous
             self.error_previous = error
         else:

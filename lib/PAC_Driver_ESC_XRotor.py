@@ -7,7 +7,7 @@ import time
 from config import config
 
 
-class PA_Driver_ESC_XRotor:
+class PAC_Driver_ESC_XRotor:
     def __init__(self, freq=500, duty_max=1023, duty_min=400):
         pins_num = config['ESC_CONFIG']['PINS']
         self.pins = []

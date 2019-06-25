@@ -12,7 +12,7 @@ get_pwms()
 """
 
 
-class PA_DriverInterface_ESC:
+class PAC_DriverInterface_ESC:
     """
     ESC (Electronic Speed Control) is used to init, config, control (speed) the motor.
     (电调模块被用于初始化，配置，控制(转速) 电机)

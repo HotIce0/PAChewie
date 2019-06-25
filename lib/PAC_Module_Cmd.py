@@ -3,7 +3,7 @@
 """
 
 
-class PA_Module_Cmd:
+class PAC_Module_Cmd:
     def __init__(self):
         print("Cmd Module initializing")
 

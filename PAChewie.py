@@ -1,8 +1,8 @@
 from config import config
-from lib.PA_Module_Safe import PA_Module_Safe
-from lib.PA_Module_Cmd import PA_Module_Cmd
-from lib.PA_Module_Sensor import PA_Module_Sensor
-from lib.PA_Module_Control import PA_Module_Control
+from lib.PAC_Module_Safe import PAC_Module_Safe
+from lib.PAC_Module_Cmd import PAC_Module_Cmd
+from lib.PAC_Module_Sensor import PAC_Module_Sensor
+from lib.PAC_Module_Control import PAC_Module_Control
 
 
 class PAChewie:
@@ -23,10 +23,10 @@ class PAChewie:
         print("vehicle info : {num_of_channel: %d, esc_pin_num_arr: %s}" % (num_of_channel, str(esc_pin_num_arr)))
 
         # load module
-        self.module_control = PA_Module_Control()
-        self.module_sensor = PA_Module_Sensor()
-        self.module_safe = PA_Module_Safe()
-        self.module_cmd = PA_Module_Cmd()
+        self.module_control = PAC_Module_Control()
+        self.module_sensor = PAC_Module_Sensor()
+        self.module_safe = PAC_Module_Safe()
+        self.module_cmd = PAC_Module_Cmd()
 
     def run(self):
         # pre_check

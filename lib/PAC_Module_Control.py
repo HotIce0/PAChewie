@@ -1,10 +1,10 @@
 from driver_config import driver_config
-from lib.PA_DriverInterface_ESC import PA_DriverInterface_ESC
-from lib.PA_LIB_PID import PA_LIB_PID
+from lib.PAC_DriverInterface_ESC import PAC_DriverInterface_ESC
+from lib.PAC_LIB_PID import PAC_LIB_PID
 import time
 
 
-class PA_Module_Control:
+class PAC_Module_Control:
     """
     Control Module (控制模块)
 
@@ -14,7 +14,7 @@ class PA_Module_Control:
         print("Control Module initializing")
         # 1. init esc interface
         esc_driver = driver_config['ESC']()
-        self.esc = PA_DriverInterface_ESC(esc_driver)
+        self.esc = PAC_DriverInterface_ESC(esc_driver)
         # do throttle range calibration (进行行程校准)
         # self.esc.trc()
         # 2. 目标状态, angle_roll 横滚x, angle_pitch 俯仰y, angle_yaw 偏航z
@@ -22,7 +22,7 @@ class PA_Module_Control:
         self.sp_angle_pitch = -9
         self.sp_angle_yaw = -87
         #
-        self.angle_pid = PA_LIB_PID(PA_LIB_PID.PID_MODE_PID)
+        self.angle_pid = PAC_LIB_PID(PAC_LIB_PID.PID_MODE_PID)
         self.angle_pid.set_param(0.05, 0, 0, 9999, 9999)
         print("Control Module initialization done.")
         pass
