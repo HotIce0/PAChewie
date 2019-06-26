@@ -83,4 +83,4 @@ class PACDriverESCXRotor:
 
         # write pwms_val to output
         for i in range(0, number_of_axles):
-            pwms[i].duty(pwms_val[i])
+            pwms[i].duty(int(pwms_val[i]))
