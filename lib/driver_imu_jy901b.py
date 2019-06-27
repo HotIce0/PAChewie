@@ -92,7 +92,7 @@ class PACDriverIMUJY901B:
         """
         i = 0
         while True:
-            if self.uart.any() < 1:
+            if self.uart.any() < 50:
                 if pre:
                     i += 1
                     print("imu pre check retrying.%d" % i)
@@ -111,7 +111,7 @@ class PACDriverIMUJY901B:
         data = self.uart.read()
         if data:
             self.parse(data)
-            # print(self.get_angles())
+            print(self.get_angles())
 
     def parse(self, data):
         """
@@ -126,27 +126,37 @@ class PACDriverIMUJY901B:
             pos = data.find(b'\x55', index)
             if pos == -1 or length - index < 11:
                 break
+            # check sum
+            calc_sum = 0
+            for i in range(0, 10):
+                calc_sum += int(data[pos + i])
+            if data[pos + 10] != (calc_sum & 0xff):
+                index = pos + 1
+                continue
+
             sig = data[pos + 1]
+            data_temp = data[pos + 2: pos + 10]
             if sig == 0x50:  # stcTime
                 self.time_year, self.time_month, self.time_day, \
                 self.time_minute, self.time_second, self.time_milisecond \
-                    = ustruct.unpack_from("BBBBBBH", data, pos + 2)
+                    = ustruct.unpack("BBBBBBH", data_temp)
             elif sig == 0x51:  # stcAcc
-                self.acc_a0, self.acc_a1, self.acc_a2, self.acc_T = ustruct.unpack_from("hhhh", data, pos + 2)
+                self.acc_a0, self.acc_a1, self.acc_a2, self.acc_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x52:  # stcGyro
-                self.gyro_w0, self.gyro_w1, self.gyro_w2, self.gyro_T = ustruct.unpack_from("hhhh", data, pos + 2)
+                self.gyro_w0, self.gyro_w1, self.gyro_w2, self.gyro_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x53:  # stcAngle
-                self.angle_0, self.angle_1, self.angle_2, self.angle_T = ustruct.unpack_from("hhhh", data, pos + 2)
+                data_temp = data[pos + 2: pos + 10]
+                self.angle_0, self.angle_1, self.angle_2, self.angle_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x54:  # stcMag
-                self.mag_h0, self.mag_h1, self.mag_h2, self.mag_T = ustruct.unpack_from("hhhh", data, pos + 2)
+                self.mag_h0, self.mag_h1, self.mag_h2, self.mag_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x55:  # stcDStatus
-                self.status0, self.status1, self.status2, self.status3 = ustruct.unpack_from("hhhh", data, pos + 2)
+                self.status0, self.status1, self.status2, self.status3 = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x56:  # stcPress
-                self.press_pressure, self.press_altitude = ustruct.unpack_from("ll", data, pos + 2)
+                self.press_pressure, self.press_altitude = ustruct.unpack("ll", data_temp)
             elif sig == 0x57:  # stcLonLat
-                self.pos_lon, self.pos_lat = ustruct.unpack_from("LL", data, pos + 2)
+                self.pos_lon, self.pos_lat = ustruct.unpack("LL", data_temp)
             elif sig == 0x58:  # stcGPSV
-                self.gps_height, self.gps_yaw, self.gps_velocity = ustruct.unpack_from("ssl", data, pos + 2)
+                self.gps_height, self.gps_yaw, self.gps_velocity = ustruct.unpack("ssl", data_temp)
             index = pos + 11
 
     def get_angles(self):
