@@ -31,3 +31,14 @@ class PACDriverInterfaceIMU:
         :return:
         """
         return self.driver.get_angles()
+
+    def get_gyros(self):
+        """
+        Get all gyros
+        (X, Y, Z)
+        :return:
+        """
+        return self.driver.get_gyros()
+
+    def get_acc(self):
+        return self.driver.get_acc()

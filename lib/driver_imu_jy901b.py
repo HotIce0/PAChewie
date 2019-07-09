@@ -111,7 +111,9 @@ class PACDriverIMUJY901B:
         data = self.uart.read()
         if data:
             self.parse(data)
-            print(self.get_angles())
+            # print(self.get_angles())
+            # print(self.get_gyros())
+            # print(self.get_acc())
 
     def parse(self, data):
         """
@@ -145,7 +147,6 @@ class PACDriverIMUJY901B:
             elif sig == 0x52:  # stcGyro
                 self.gyro_w0, self.gyro_w1, self.gyro_w2, self.gyro_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x53:  # stcAngle
-                data_temp = data[pos + 2: pos + 10]
                 self.angle_0, self.angle_1, self.angle_2, self.angle_T = ustruct.unpack("hhhh", data_temp)
             elif sig == 0x54:  # stcMag
                 self.mag_h0, self.mag_h1, self.mag_h2, self.mag_T = ustruct.unpack("hhhh", data_temp)
@@ -161,3 +162,9 @@ class PACDriverIMUJY901B:
 
     def get_angles(self):
         return self.angle_0 / 32768 * 180, self.angle_1 / 32768 * 180, self.angle_2 / 32768 * 180
+
+    def get_gyros(self):
+        return self.gyro_w0 / 32768 * 2000, self.gyro_w1 / 32768 * 2000, self.gyro_w2 / 32768 * 2000
+
+    def get_acc(self):
+        return self.acc_a0 / 32768 * 16, self.acc_a1 / 32768 * 16, self.acc_a2 / 32768 * 16
