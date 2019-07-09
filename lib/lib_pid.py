@@ -3,10 +3,25 @@ import math
 
 
 class PACLibPID:
-    PID_MODE_PID = const(0)
+    """
+    Implementation of generic PID controller.
+    """
+    # Use PID_MODE_DERIVATIV_NONE for a PI controller (vs PID)
+    PID_MODE_DERIVATIV_NONE = const(0)
+    # PID_MODE_DERIVATIV_CALC calculates discrete derivative from previous error, val_dot in pid_calculate() will be
+    # ignored
+    PID_MODE_DERIVATIV_CALC = const(1)
+    # PID_MODE_DERIVATIV_CALC_NO_SP calculates discrete derivative from previous value
+    # setpoint derivative will be ignored, val_dot in pid_calculate() will be ignored
+    PID_MODE_DERIVATIV_CALC_NO_SP = const(2)
+    # Use PID_MODE_DERIVATIV_SET if you have the derivative already (Gyros, Kalman)
+    PID_MODE_DERIVATIV_SET = const(3)
 
-    def __init__(self, pid_mode):
-        self.pid_mod = pid_mode
+    SIGMA = float(0.000001)
+
+    def __init__(self, pid_mod, dt_min=0.01):
+        self.pid_mod = pid_mod
+        self.dt_min = dt_min
         self.kp = 0.0
         self.ki = 0.0
         self.kd = 0.0
@@ -28,33 +43,31 @@ class PACLibPID:
         if math.isfinite(output_limit):
             self.output_limit = output_limit
 
-    def reset_integral(self):
-        self.integral = 0.0
+    def get_param(self):
+        return self.kp, self.ki, self.kd, self.integral_limit, self.output_limit
 
-    def calc(self, sp, val):
-        """
-        calculate PID value
-        :param sp:
-        :param val:
-        :return:
-        """
+    def calc(self, sp, val, dt, val_dot=0):
         output_limit = self.output_limit
         ki = self.ki
         kd = self.kd
         kp = self.kp
-        pid_mod = self.pid_mod
 
-        # validate parameter
-        if not math.isfinite(sp) or not math.isfinite(val):
+        pid_mod = self.pid_mod
+        if not math.isfinite(sp) or not math.isfinite(val) or not math.isfinite(val_dot) or not math.isfinite(dt):
             return self.last_output
 
-        # P current error value
+        # current error value
         error = sp - val
 
-        # D current error derivative
-        if pid_mod == PACLibPID.PID_MODE_PID:
-            d = error - self.error_previous
+        # current error derivative
+        if pid_mod == PACLibPID.PID_MODE_DERIVATIV_CALC:
+            d = (error - self.error_previous) / max(dt, self.dt_min)
             self.error_previous = error
+        elif pid_mod == PACLibPID.PID_MODE_DERIVATIV_CALC_NO_SP:
+            d = (-val - self.error_previous) / max(dt, self.dt_min)
+            self.error_previous = -val
+        elif pid_mod == PACLibPID.PID_MODE_DERIVATIV_SET:
+            d = -val_dot
         else:
             d = 0.0
 
@@ -63,22 +76,32 @@ class PACLibPID:
 
         # calculate PD output
         output = (error * kp) + (d * kd)
-        # I
-        i = self.integral + error
-        if math.isfinite(i):
-            # validate saturation
-            if (math.fabs(output + (i * ki)) <= output_limit) and (math.fabs(i) <= self.integral_limit):
-                self.integral = i
 
-        output += self.integral * ki
+        if ki > PACLibPID.SIGMA:
+            # Calculate the error integral and check for saturation
+            i = self.integral + (error * dt)
+
+            # check for saturation
+            if math.isfinite(i):
+                if (output_limit < PACLibPID.SIGMA or (math.fabs(output + (i * ki)) <= output_limit)) \
+                        and (math.fabs(i) <= self.integral_limit):
+                    # not saturated, use new integral value
+                    self.integral = i
+
+            # add I component to output
+            output += self.integral * ki
 
         # limit output
         if math.isfinite(output):
-            if output > output_limit:
-                output = output_limit
-            elif output < -output_limit:
-                output = -output_limit
+            if output_limit > PACLibPID.SIGMA:
+                if output > output_limit:
+                    output = output_limit
+                elif output < -output_limit:
+                    output = -output_limit
 
             self.last_output = output
 
         return self.last_output
+
+    def reset_integral(self):
+        self.integral = 0.0
