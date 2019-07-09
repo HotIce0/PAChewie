@@ -1,5 +1,6 @@
 import ujson
 from config import config
+from lib import lib_config_operate
 import network
 try:
     import usocket as socket
@@ -17,6 +18,7 @@ class PACModuleStation:
         "SP_READ_FLASH_PID_CONFIG_ACTION": 2,
         "SP_WRITE_FLASH_PID_CONFIG_ACTION": 3,
     }
+
     def __init__(self, pachewie):
         # wlan sta_if mode
         self.nic = network.WLAN(network.STA_IF)
@@ -119,7 +121,58 @@ class PACModuleStation:
             response = ujson.dumps(response_obj) + "\n"
             self.client_s.write(response)
         elif action == PACModuleStation.station_protocol['SP_WRITE_CURRENT_PID_CONFIG_ACTION']:
-
+            module_control = self.pachewie.module_control
+            angle_roll = param['ANGLE_ROLL']
+            angle_pitch = param['ANGLE_PITCH']
+            angle_yaw = param['ANGLE_YAW']
+            gyros_roll = param['GYROS_ROLL']
+            gyros_pitch = param['GYROS_PITCH']
+            gyros_yaw = param['GYROS_YAW']
+            # Write current PID config
+            module_control.angle_roll_pid.set_param(
+                angle_roll[0], angle_roll[1], angle_roll[2], angle_roll[3], angle_roll[4]
+            )
+            module_control.angle_pitch_pid.set_param(
+                angle_pitch[0], angle_pitch[1], angle_pitch[2], angle_pitch[3], angle_pitch[4]
+            )
+            module_control.angle_yaw_pid.set_param(
+                angle_yaw[0], angle_yaw[1], angle_yaw[2], angle_yaw[3], angle_yaw[4]
+            )
+            module_control.gyros_roll_pid.set_param(
+                gyros_roll[0], gyros_roll[1], gyros_roll[2], gyros_roll[3], gyros_roll[4]
+            )
+            module_control.gyros_pitch_pid.set_param(
+                gyros_pitch[0], gyros_pitch[1], gyros_pitch[2], gyros_pitch[3], gyros_pitch[4]
+            )
+            module_control.gyros_yaw_pid.set_param(
+                gyros_yaw[0], gyros_yaw[1], gyros_yaw[2], gyros_yaw[3], gyros_yaw[4]
+            )
+            response_obj = {
+                "code": 0,
+                "action": action,
+                "data": "write current pid config success"
+            }
+            response = ujson.dumps(response_obj) + "\n"
+            self.client_s.write(response)
+        elif action == PACModuleStation.station_protocol['SP_READ_FLASH_PID_CONFIG_ACTION']:
+            pids = lib_config_operate.read_config_json_obj('pid.json')
+            response_obj = {
+                "code": 0,
+                "action": action,
+                "data": pids
+            }
+            response = ujson.dumps(response_obj) + "\n"
+            self.client_s.write(response)
+        elif action == PACModuleStation.station_protocol['SP_WRITE_FLASH_PID_CONFIG_ACTION']:
+            pids = param
+            lib_config_operate.write_config_json_obj('pid.json', pids)
+            response_obj = {
+                "code": 0,
+                "action": action,
+                "data": "write pid config in FLASH success"
+            }
+            response = ujson.dumps(response_obj) + "\n"
+            self.client_s.write(response)
 
 
 
