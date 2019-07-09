@@ -3,6 +3,9 @@ from lib.module_safe import PACModuleSafe
 from lib.module_cmd import PACModuleCmd
 from lib.module_sensor import PACModuleSensor
 from lib.module_control import PACModuleControl
+from lib.module_station import PACModuleStation
+import timer
+import _thread
 
 
 class PAChewie:
@@ -23,6 +26,8 @@ class PAChewie:
         self.module_sensor = PACModuleSensor()
         self.module_safe = PACModuleSafe()
         self.module_cmd = PACModuleCmd()
+        # station module
+        self.module_sation = PACModuleStation(self)
 
     def run(self):
         # pre_check
@@ -37,7 +42,17 @@ class PAChewie:
         self.module_control.test()
 
         while True:
-            self.module_safe()
-            self.module_cmd()
-            self.module_sensor()
-            self.module_control(module_sensor=self.module_sensor)
+
+            # self.module_safe()
+            # self.module_cmd()
+            if timer.loop100HzFlag:
+                timer.loop100HzFlag = 0
+
+                self.module_sensor()
+
+            if timer.loop200HzFlag:
+                timer.loop200HzFlag = 0
+
+                self.module_control(module_sensor=self.module_sensor)
+
+
