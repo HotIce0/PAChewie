@@ -16,14 +16,12 @@ class PACDriverESCXRotor:
         self.duty_max = duty_max
         self.duty_min = duty_min
         self.pwms = []
-        self.pwms_val = []
         # create Pin objects
         for i in pins_num:
             self.pins.append(Pin(i))
         # init PWM with Pin objects
         for i in range(0, self.number_of_axles):
             self.pwms.append(PWM(self.pins[i], freq=freq, duty=0))
-            self.pwms_val.append(0)
 
     def trc(self):
         """ Throttle Range Calibration """
@@ -60,9 +58,6 @@ class PACDriverESCXRotor:
         """ Get the PWM objects : machine.PWM """
         return self.pwms
 
-    def get_current_pwm_values(self):
-        return self.pwms_val
-
     def update_current_pwm_values(self, pwms_val):
         """
 
@@ -79,7 +74,6 @@ class PACDriverESCXRotor:
                 pwms_val[i] = duty_max
             elif pwms_val[i] < duty_min:
                 pwms_val[i] = duty_min
-            self.pwms_val[i] = pwms_val[i]
 
         # write pwms_val to output
         for i in range(0, number_of_axles):
