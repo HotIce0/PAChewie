@@ -32,6 +32,8 @@ class PACLibPID:
         self.last_output = 0.0
 
     def set_param(self, kp, ki, kd, integral_limit, output_limit):
+        self.error_previous = 0.0
+        self.last_output = 0.0
         if math.isfinite(kp):
             self.kp = kp
         if math.isfinite(ki):
