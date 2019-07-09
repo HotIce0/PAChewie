@@ -1,4 +1,5 @@
 config = {
+    "LOG_FILENAME": "log.txt",
     # The number of channel. OPTIONS:{4}
     "NUM_OF_CHANNEL": 4,
     # ESC config
@@ -13,4 +14,10 @@ config = {
         "TX": 12,
         "RX": 13,
     },
+    # Wifi config
+    "STATION_CONFIG": {
+        "WIFI_SSID": "Hotice0-ip",
+        "WIFI_PASSWORD": "987654321",
+        "WEBSOCKET_PORT": 5174
+    }
 }
