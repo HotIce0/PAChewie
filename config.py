@@ -1,4 +1,5 @@
 config = {
+    "PROJECT_BASE_PATH": "/sd",
     "LOG_FILENAME": "log.txt",
     # The number of channel. OPTIONS:{4}
     "NUM_OF_CHANNEL": 4,
