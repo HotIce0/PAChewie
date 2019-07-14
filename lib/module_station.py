@@ -17,6 +17,8 @@ class PACModuleStation:
         "SP_WRITE_CURRENT_PID_CONFIG_ACTION": 1,
         "SP_READ_FLASH_PID_CONFIG_ACTION": 2,
         "SP_WRITE_FLASH_PID_CONFIG_ACTION": 3,
+        "SP_REMOTE_CONTROL_THROTTLE_ACTION": 4,
+        "SP_REMOTE_CONTROL_YAW_ACTION": 5,
     }
 
     def __init__(self, pachewie):
@@ -29,8 +31,8 @@ class PACModuleStation:
 
         # connect to wifi
         self.connect_to_wifi()
-        # start server
-        self.start_server()
+        # # start server
+        # self.start_server()
 
     def connect_to_wifi(self):
         station_config = config['STATION_CONFIG']
@@ -129,22 +131,22 @@ class PACModuleStation:
             gyros_pitch = param['GYROS_PITCH']
             gyros_yaw = param['GYROS_YAW']
             # Write current PID config
-            module_control.angle_roll_pid.set_param(
+            module_control.angle_roll_pid.update_pid_settings(
                 angle_roll[0], angle_roll[1], angle_roll[2], angle_roll[3], angle_roll[4]
             )
-            module_control.angle_pitch_pid.set_param(
+            module_control.angle_pitch_pid.update_pid_settings(
                 angle_pitch[0], angle_pitch[1], angle_pitch[2], angle_pitch[3], angle_pitch[4]
             )
-            module_control.angle_yaw_pid.set_param(
+            module_control.angle_yaw_pid.update_pid_settings(
                 angle_yaw[0], angle_yaw[1], angle_yaw[2], angle_yaw[3], angle_yaw[4]
             )
-            module_control.gyros_roll_pid.set_param(
+            module_control.gyros_roll_pid.update_pid_settings(
                 gyros_roll[0], gyros_roll[1], gyros_roll[2], gyros_roll[3], gyros_roll[4]
             )
-            module_control.gyros_pitch_pid.set_param(
+            module_control.gyros_pitch_pid.update_pid_settings(
                 gyros_pitch[0], gyros_pitch[1], gyros_pitch[2], gyros_pitch[3], gyros_pitch[4]
             )
-            module_control.gyros_yaw_pid.set_param(
+            module_control.gyros_yaw_pid.update_pid_settings(
                 gyros_yaw[0], gyros_yaw[1], gyros_yaw[2], gyros_yaw[3], gyros_yaw[4]
             )
             response_obj = {
@@ -173,6 +175,13 @@ class PACModuleStation:
             }
             response = ujson.dumps(response_obj) + "\n"
             self.client_s.write(response)
+        elif action == PACModuleStation.station_protocol['SP_REMOTE_CONTROL_THROTTLE_ACTION']:
+            throttle_value = param
+            print("油门值: " + str(throttle_value))
+            self.pachewie.module_control.set_throttle(int(throttle_value))
+        elif action == PACModuleStation.station_protocol['SP_REMOTE_CONTROL_YAW_ACTION']:
+            yaw = param
+            self.pachewie.module_control.set_yaw(int(yaw))
 
 
 

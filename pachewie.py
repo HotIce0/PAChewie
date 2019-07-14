@@ -28,6 +28,7 @@ class PAChewie:
         self.module_cmd = PACModuleCmd()
         # station module
         self.module_sation = PACModuleStation(self)
+        _thread.start_new_thread(self.module_sation.start_server, ())
 
     def run(self):
         # pre_check
@@ -42,17 +43,14 @@ class PAChewie:
         self.module_control.test()
 
         while True:
-
             # self.module_safe()
             # self.module_cmd()
-            if timer.loop100HzFlag:
-                timer.loop100HzFlag = 0
-
+            if timer.flag_imu_update:
                 self.module_sensor()
+                timer.flag_imu_update = False
 
-            if timer.loop200HzFlag:
-                timer.loop200HzFlag = 0
-
+            if timer.flag_attitude_ctrl:
                 self.module_control(module_sensor=self.module_sensor)
+                timer.flag_attitude_ctrl = False
 
 

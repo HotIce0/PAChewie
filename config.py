@@ -11,14 +11,14 @@ config = {
     },
     # IMU config
     "IMU_CONFIG": {
-        "BAUDRATE": 115200,
+        "BAUDRATE": 921600,
         "TX": 12,
         "RX": 13,
     },
     # Wifi config
     "STATION_CONFIG": {
-        "WIFI_SSID": "Hotice0-ip",
-        "WIFI_PASSWORD": "987654321",
+        "WIFI_SSID": "5214",
+        "WIFI_PASSWORD": "52145214A",
         "WEBSOCKET_PORT": 5174
     }
 }
